@@ -15,8 +15,8 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:git:https://github.com/johnjcool/cas-services.git</connection>
-		<url>https://github.com/johnjcool/cas-services</url>
+		<connection>scm:git:https://github.com/johnjcool/keycloak-cas-services.git</connection>
+		<url>https://github.com/johnjcool/keycloak-cas-services</url>
 	</scm>
 
 	<developers>
