@@ -2,9 +2,29 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.jjc.keycloak</groupId>
+	<groupId>io.github.johnjcool</groupId>
 	<artifactId>cas-services</artifactId>
 	<version>4.1.0-SNAPSHOT</version>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:https://github.com/johnjcool/cas-services.git</connection>
+		<url>https://github.com/johnjcool/cas-services</url>
+	</scm>
+
+	<developers>
+		<developer>
+			<name>John J Cool</name>
+			<email>john.j.cool@gmail.com</email>
+		</developer>
+	</developers>
 
 	<properties>
 		<keycloak.version>4.1.0.Final</keycloak.version>
@@ -94,4 +114,21 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<distributionmanagement>
+		<site>
+			<id>api.wiki</id>
+			<url>https://github.com/phillip-kruger/apiee/wiki</url>
+		</site>
+
+		<snapshotrepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotrepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+
+	</distributionmanagement>
 </project>
