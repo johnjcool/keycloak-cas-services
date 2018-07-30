@@ -1,4 +1,4 @@
-package org.jjc.keycloak.broker.cas;
+package io.github.johnjcool.keycloak.broker.cas;
 
 import org.keycloak.models.IdentityProviderModel;
 

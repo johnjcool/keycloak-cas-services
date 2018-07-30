@@ -1,5 +1,10 @@
 package org.jjc.keycloak.broker.cas.model;
 
+import io.github.johnjcool.keycloak.broker.cas.jaxb.ServiceResponseJaxbContextResolver;
+import io.github.johnjcool.keycloak.broker.cas.jaxb.ServiceResponseJaxbProvider;
+import io.github.johnjcool.keycloak.broker.cas.model.ServiceResponse;
+import io.github.johnjcool.keycloak.broker.cas.model.Success;
+
 import java.io.File;
 
 import javax.ws.rs.Consumes;
@@ -16,8 +21,6 @@ import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.jjc.keycloak.broker.cas.jaxb.ServiceResponseJaxbContextResolver;
-import org.jjc.keycloak.broker.cas.jaxb.ServiceResponseJaxbProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

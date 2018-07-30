@@ -1,4 +1,4 @@
-package org.jjc.keycloak.broker.cas.jaxb;
+package io.github.johnjcool.keycloak.broker.cas.jaxb;
 
 import java.util.ArrayList;
 import java.util.HashMap;

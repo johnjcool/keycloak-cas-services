@@ -1,4 +1,4 @@
-package org.jjc.keycloak.broker.cas.model;
+package io.github.johnjcool.keycloak.broker.cas.model;
 
 import java.io.Serializable;
 

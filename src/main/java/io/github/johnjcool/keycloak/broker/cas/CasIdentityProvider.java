@@ -1,4 +1,9 @@
-package org.jjc.keycloak.broker.cas;
+package io.github.johnjcool.keycloak.broker.cas;
+
+import io.github.johnjcool.keycloak.broker.cas.jaxb.ServiceResponseJaxbContextResolver;
+import io.github.johnjcool.keycloak.broker.cas.jaxb.ServiceResponseJaxbProvider;
+import io.github.johnjcool.keycloak.broker.cas.model.ServiceResponse;
+import io.github.johnjcool.keycloak.broker.cas.model.Success;
 
 import java.net.URI;
 
@@ -18,10 +23,6 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.jjc.keycloak.broker.cas.jaxb.ServiceResponseJaxbContextResolver;
-import org.jjc.keycloak.broker.cas.jaxb.ServiceResponseJaxbProvider;
-import org.jjc.keycloak.broker.cas.model.ServiceResponse;
-import org.jjc.keycloak.broker.cas.model.Success;
 import org.keycloak.broker.provider.AbstractIdentityProvider;
 import org.keycloak.broker.provider.AuthenticationRequest;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
