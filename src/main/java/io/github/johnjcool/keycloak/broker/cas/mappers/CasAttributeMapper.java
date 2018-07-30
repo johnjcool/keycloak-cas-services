@@ -1,8 +1,9 @@
-package org.jjc.keycloak.broker.cas.mappers;
+package io.github.johnjcool.keycloak.broker.cas.mappers;
+
+import io.github.johnjcool.keycloak.broker.cas.CasIdentityProviderFactory;
 
 import java.util.List;
 
-import org.jjc.keycloak.broker.cas.CasIdentityProviderFactory;
 import org.keycloak.broker.provider.AbstractIdentityProviderMapper;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.models.IdentityProviderMapperModel;
