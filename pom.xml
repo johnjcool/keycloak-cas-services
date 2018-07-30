@@ -115,20 +115,20 @@
 		</plugins>
 	</build>
 
-	<distributionmanagement>
+	<distributionManagement>
 		<site>
 			<id>api.wiki</id>
 			<url>https://github.com/phillip-kruger/apiee/wiki</url>
 		</site>
 
-		<snapshotrepository>
+		<snapshotRepository>
 			<id>ossrh</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotrepository>
+		</snapshotRepository>
 		<repository>
 			<id>ossrh</id>
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 
-	</distributionmanagement>
+	</distributionManagement>
 </project>
