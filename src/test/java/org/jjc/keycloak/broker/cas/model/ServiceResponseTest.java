@@ -1,4 +1,4 @@
-package de.rewe.keycloak.broker.cas.model;
+package org.jjc.keycloak.broker.cas.model;
 
 import java.io.File;
 
@@ -18,8 +18,6 @@ import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.jjc.keycloak.broker.cas.jaxb.ServiceResponseJaxbContextResolver;
 import org.jjc.keycloak.broker.cas.jaxb.ServiceResponseJaxbProvider;
-import org.jjc.keycloak.broker.cas.model.ServiceResponse;
-import org.jjc.keycloak.broker.cas.model.Success;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,12 +41,10 @@ public class ServiceResponseTest {
 		Assert.assertEquals(200, response.getStatus());
 		response.bufferEntity();
 
-		System.out.println(response.readEntity(String.class));
-
 		ServiceResponse serviceResponse = response.readEntity(ServiceResponse.class);
 		Success success = serviceResponse.getSuccess();
 
-		Assert.assertEquals("A02D1CB", success.getUser());
+		Assert.assertEquals("test", success.getUser());
 		Assert.assertTrue(success.getAttributes() != null);
 	}
 
