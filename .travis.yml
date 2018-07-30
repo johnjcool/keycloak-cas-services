@@ -9,5 +9,5 @@ deploy:
   file: "target/cas-services-$project_version.jar"
   skip_cleanup: true
   on:
-    repo: johnjcool/cas-services
+    repo: johnjcool/keycloak-cas-services
   name: $project_version
