@@ -23,5 +23,3 @@ dist/
 nbdist/
 .nb-gradle/
 /derby.log
-src/main/resources/application-local.yaml
-src/main/resources/application.yaml
