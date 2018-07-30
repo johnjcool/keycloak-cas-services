@@ -1,1 +1,8 @@
 language: java
+deploy:
+  provider: releases
+  api_key:
+    secure: QVqZCAtS1IxNb0GX52NCfh43FnTr15IFOGIxi0Utzq76BvpAABpLJID2H2Fenk7qDhcakeWPgjgENNDy0rsc63w9HOym2F+IsauMXKZ2D4oAAGw02TmRfIuxxCXJfZfvM2R+PWduN+vmsho5lODs4IesqxbCrkCEBY3VNaP/hKlS2PPtPoV5/vM7XOtt1GPAHNswlgnQHbtnmq28BsA7Qlp/n9jp9cAjqVFfXeXv1B6rTpEkKSFTCQHT7RYUCFJ2LnqQR+8FwtfG1BAe2OvwS7yvNOJMfUnwuuOGTSmU3LIgDkYqXqYi15+ip8p3zk1gqqTfFA1PnFlJY+BuWMqlNgNR/KB1C3LXAWETK9EUjtZEoZjZh50rokKtmtT2s7BAAjaXa9KDV4+SPnG+3tkDneRObtivKqgrUpkZ0kNU/eO/NURuKlwEXEpeH5TH906PZBZOgtpatTdytev7Fsb/6vOLmMKsIVwtJUD2uxCegQQRz7I/KV60XSQjRIqe9F6uxOZ1kTaIqDcbASbIinP4ypgbsVlLJloOr65XXQEWmJWb/H3MAP7wSvXXBubvBzxOzILe0NqH8JWhJlcmPh+FqSmGLUcYIH7+WZ/CNempcHzowAsdZleP+EsygeE9nCTFKS3HHwBA5ROyy7sDD7VlygXse2VfzpPyOxbkqtMDa68=
+  file: ".travis.yml"
+  on:
+    repo: johnjcool/cas-services
