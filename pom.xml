@@ -104,6 +104,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
 				<configuration>
 					<archive>
 						<manifestEntries>
@@ -133,7 +134,7 @@
 						<artifactId>nexus-staging-maven-plugin</artifactId>
 						<version>1.6.8</version>
 						<extensions>true</extensions>
-						<configuration>
+						<configuration>						
 							<serverId>ossrh</serverId>
 							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 							<autoReleaseAfterClose>true</autoReleaseAfterClose>
