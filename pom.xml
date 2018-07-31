@@ -129,20 +129,20 @@
 				<plugins>
 					<!-- To release to Maven central -->
 					<plugin>
-						<groupid>org.sonatype.plugins</groupid>
-						<artifactid>nexus-staging-maven-plugin</artifactid>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
 						<version>1.6.8</version>
 						<extensions>true</extensions>
 						<configuration>
-							<serverid>ossrh</serverid>
-							<nexusurl>https://oss.sonatype.org/</nexusurl>
-							<autoreleaseafterclose>true</autoreleaseafterclose>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
 						</configuration>
 					</plugin>
 					<!-- To generate javadoc -->
 					<plugin>
-						<groupid>org.apache.maven.plugins</groupid>
-						<artifactid>maven-source-plugin</artifactid>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
 						<version>3.0.1</version>
 						<executions>
 							<execution>
@@ -154,8 +154,8 @@
 						</executions>
 					</plugin>
 					<plugin>
-						<groupid>org.apache.maven.plugins</groupid>
-						<artifactid>maven-javadoc-plugin</artifactid>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
 						<version>2.10.4</version>
 						<executions>
 							<execution>
@@ -169,8 +169,8 @@
 
 					<!-- To sign the artifacts -->
 					<plugin>
-						<groupid>org.apache.maven.plugins</groupid>
-						<artifactid>maven-gpg-plugin</artifactid>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
 						<version>1.6</version>
 						<executions>
 							<execution>
