@@ -1,10 +1,6 @@
 {
-	"themes": [
-		{
-			"name": "keycloak-cas-extension",
-			"types": [
-				"admin"
-			]
-		}
-	]
+	"themes": [{
+		"name" : "keycloak-extended",
+		"types": [ "admin" ]
+	}]
 }
