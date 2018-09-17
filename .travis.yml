@@ -22,12 +22,12 @@ jobs:
     - stage: deploy_snapshot
       before_script:
         - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-        - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
-        - cp src/main/docker/Dockerfile target/Dockerfile
+        - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust        
         - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')        
       script:
         - mvn deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease 
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cp src/main/docker/Dockerfile target/Dockerfile
         - cd target
         - docker build --tag $DOCKER_USERNAME/keycloak-cas:$project_version --build-arg project_version=${project_version} .
         - docker push $DOCKER_USERNAME/keycloak-cas:$project_version
@@ -35,14 +35,14 @@ jobs:
     - stage: deploy_release
       before_script:
         - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-        - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
-        - cp src/main/docker/Dockerfile target/Dockerfile
+        - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust        
         - export project_version=$TRAVIS_TAG
       script:
         - mvn org.codehaus.mojo:versions-maven-plugin:2.5:set --settings .travis/settings.xml -DnewVersion=$project_version -B -U
         - mvn clean deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease 
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - cd target
+        - cp src/main/docker/Dockerfile target/Dockerfile
+        - cd target        
         - docker build --tag $DOCKER_USERNAME/keycloak-cas:$project_version --build-arg project_version=${project_version} .
         - docker push $DOCKER_USERNAME/keycloak-cas:$project_version
         - docker tag $DOCKER_USERNAME/keycloak-cas:$project_version $DOCKER_USERNAME/keycloak-cas:latest
