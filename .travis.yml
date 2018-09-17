@@ -1,15 +1,14 @@
 language: java
-
 services:
-  - docker
-  
+- docker
 before_deploy:
-  - mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
-  - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')
+- mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
+- export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep
+  -v '\[')
 deploy:
   provider: releases
   api_key:
-    secure: QVqZCAtS1IxNb0GX52NCfh43FnTr15IFOGIxi0Utzq76BvpAABpLJID2H2Fenk7qDhcakeWPgjgENNDy0rsc63w9HOym2F+IsauMXKZ2D4oAAGw02TmRfIuxxCXJfZfvM2R+PWduN+vmsho5lODs4IesqxbCrkCEBY3VNaP/hKlS2PPtPoV5/vM7XOtt1GPAHNswlgnQHbtnmq28BsA7Qlp/n9jp9cAjqVFfXeXv1B6rTpEkKSFTCQHT7RYUCFJ2LnqQR+8FwtfG1BAe2OvwS7yvNOJMfUnwuuOGTSmU3LIgDkYqXqYi15+ip8p3zk1gqqTfFA1PnFlJY+BuWMqlNgNR/KB1C3LXAWETK9EUjtZEoZjZh50rokKtmtT2s7BAAjaXa9KDV4+SPnG+3tkDneRObtivKqgrUpkZ0kNU/eO/NURuKlwEXEpeH5TH906PZBZOgtpatTdytev7Fsb/6vOLmMKsIVwtJUD2uxCegQQRz7I/KV60XSQjRIqe9F6uxOZ1kTaIqDcbASbIinP4ypgbsVlLJloOr65XXQEWmJWb/H3MAP7wSvXXBubvBzxOzILe0NqH8JWhJlcmPh+FqSmGLUcYIH7+WZ/CNempcHzowAsdZleP+EsygeE9nCTFKS3HHwBA5ROyy7sDD7VlygXse2VfzpPyOxbkqtMDa68=
+    secure: u16W9ADbkhxIn9z+dXRHjHqWxVMmbcewYAMSYMMv/NrkV9cDFPu2DO/ApBDceLEkGX7XW1lDGBsiHL87hk6vsmLs7qb3ScWzpjDSBo6G20LxOMpA5f1B/plE9F72vLj3X1sHn3w8gD3Chf6YZ2JN4ouniUHNJwAdxKmULLS5oOB/4pediKPQWzUuDOKr2LrXmdgqLGSiuq5qCNCb84z6JmkHDsbe9sLb7Z96ZeXwzt+pvJlmw9+cvQOj1SHeD/5lHO3qXWAWKrtQwrZv9qIuA220K1zWTxju4FcM/MWHcrWJjhrYQWrLjx9D2q9NxwDJraRZwOGEK+cy0H9wtnF7UDkGp/8Lo7WQbULwHChgSdDoSuhvc6QhGK7yk3m58amrIzHsxBRQUgDGlfRhrpaHeeVFODDjpnPVBFe5RcT63GwSSYC4SQzUUZ1TAYdiTkMHFxKBSts6JcOJuMJm6eNEqo9FRgk5G0Wf8FtYlPxmwbI/oI0IcDCyW3Q178Hn4gozO/oib7m53Z4nVw296lgeWi1Sf4Nqlf+4vo4PkXwT9dOkVxLOAKNQ684e/lrXOuXTOWz2/cZdfKHaCP2EIHXX1NmtXD7VgVzcdBA6Bw8NdZKdZ7IolWjtrtO8+99xv5MWaQve44LK3eR/oqflCb6nVbMlZ/r3pWlWZBtcvbQA8Nw=
   file: 
     - "target/keycloak-cas-services-$project_version.jar"
     - "target/keycloak-cas-services-$project_version-sources.jar"
