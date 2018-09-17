@@ -20,9 +20,6 @@ stages:
 jobs:
   include:
     - stage: compile
-    - stage: test
-      script:
-        - mvn test --settings .travis/settings.xml -B -U
     - stage: deploy_snapshot
       before_script:
         - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
