@@ -43,7 +43,7 @@ jobs:
         - mvn clean deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease 
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - cd target
-        - docker build --tag $DOCKER_USERNAME/keycloak-cas:$project_version --build-arg project_version=${project_version} ./target
+        - docker build --tag $DOCKER_USERNAME/keycloak-cas:$project_version --build-arg project_version=${project_version} .
         - docker push $DOCKER_USERNAME/keycloak-cas:$project_version
         - docker tag $DOCKER_USERNAME/keycloak-cas:$project_version $DOCKER_USERNAME/keycloak-cas:latest
         - docker push $DOCKER_USERNAME/keycloak-cas:latest
