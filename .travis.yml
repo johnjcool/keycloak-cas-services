@@ -1,31 +1,60 @@
 sudo: false
-
 language: java
-
 jdk:
 - oraclejdk8
-
 services:
 - docker
- 
-## Build and release to maven central
-script:
-- mvn clean verify --settings .travis/settings.xml -B -U
-
 cache:
   directories:
     - $HOME/.m2
+    - $TRAVIS_BUILD_DIR/target
 
-## export GPG details
-before_deploy:
-- echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-- echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
-
-deploy:
-  provider: script
-  script: ./travis/release.sh
-  skip_cleanup: true
-  on:
-    repo: johnjcool/keycloak-cas-services
-    tags: true
-    jdk: oraclejdk8
+stages:
+  - compile
+  - test
+  - name: deploy_snapshot
+    if: branch = master
+  - name: deploy_release
+    if: tag IS present
+  
+jobs:
+  include:
+    - stage: compile
+      script: 
+        - mvn install --settings .travis/settings.xml -DskipTests=true -B -U
+    - stage: test
+      script:
+        - mvn test --settings .travis/settings.xml -B -U
+    - stage: deploy_snapshot
+      script: skip        
+      before_deploy:
+        - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+        - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+        - cp src/main/docker/Dockerfile target/Dockerfile
+        - mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
+        - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')        
+      deploy: 
+        provider: script
+        skip_cleanup: true
+        script:
+          - mvn deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease 
+          - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          - docker build -t $DOCKER_USERNAME/keycloak-cas:$project_version ./target
+          - docker push $DOCKER_USERNAME/keycloak-cas:$project_version
+    - stage: deploy_release
+      script: skip 
+      before_deploy:
+        - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+        - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+        - export project_version=$TRAVIS_TAG
+      deploy: 
+        provider: script
+        skip_cleanup: true
+        script:
+          - mvn org.codehaus.mojo:versions-maven-plugin:2.5:set --settings .travis/settings.xml -DnewVersion=$project_version -B -U
+          - mvn clean deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease 
+          - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          - docker build -t $DOCKER_USERNAME/keycloak-cas:$project_version ./target
+          - docker push $DOCKER_USERNAME/keycloak-cas:$project_version
+          - docker tag $DOCKER_USERNAME/keycloak-cas:$project_version $DOCKER_USERNAME/keycloak-cas:latest
+          - docker push $DOCKER_USERNAME/keycloak-cas:latest
