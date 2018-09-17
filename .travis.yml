@@ -1,33 +1,31 @@
+sudo: false
+
 language: java
 
+jdk:
+- oraclejdk8
+
 services:
-    - docker
-    
-## export GPG details
-before_install:
-    - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-    - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
-    
-install:
-    mvn --settings .maven.xml install -DskipTests=true -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
-    
+- docker
+ 
 ## Build and release to maven central
 script:
-    mvn clean deploy --settings .maven.xml -DskipTests=true -B -U -Prelease
-    
+- mvn clean verify --settings .travis/settings.xml -B -U
+
+cache:
+  directories:
+    - $HOME/.m2
+
+## export GPG details
 before_deploy:
-- mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
-- export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep
-  -v '\[')
-  
+- echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+- echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+
 deploy:
-  provider: releases
-  api_key:
-    secure: u16W9ADbkhxIn9z+dXRHjHqWxVMmbcewYAMSYMMv/NrkV9cDFPu2DO/ApBDceLEkGX7XW1lDGBsiHL87hk6vsmLs7qb3ScWzpjDSBo6G20LxOMpA5f1B/plE9F72vLj3X1sHn3w8gD3Chf6YZ2JN4ouniUHNJwAdxKmULLS5oOB/4pediKPQWzUuDOKr2LrXmdgqLGSiuq5qCNCb84z6JmkHDsbe9sLb7Z96ZeXwzt+pvJlmw9+cvQOj1SHeD/5lHO3qXWAWKrtQwrZv9qIuA220K1zWTxju4FcM/MWHcrWJjhrYQWrLjx9D2q9NxwDJraRZwOGEK+cy0H9wtnF7UDkGp/8Lo7WQbULwHChgSdDoSuhvc6QhGK7yk3m58amrIzHsxBRQUgDGlfRhrpaHeeVFODDjpnPVBFe5RcT63GwSSYC4SQzUUZ1TAYdiTkMHFxKBSts6JcOJuMJm6eNEqo9FRgk5G0Wf8FtYlPxmwbI/oI0IcDCyW3Q178Hn4gozO/oib7m53Z4nVw296lgeWi1Sf4Nqlf+4vo4PkXwT9dOkVxLOAKNQ684e/lrXOuXTOWz2/cZdfKHaCP2EIHXX1NmtXD7VgVzcdBA6Bw8NdZKdZ7IolWjtrtO8+99xv5MWaQve44LK3eR/oqflCb6nVbMlZ/r3pWlWZBtcvbQA8Nw=
-  file: 
-    - "target/keycloak-cas-services-$project_version.jar"
-    - "target/keycloak-cas-services-$project_version-sources.jar"
+  provider: script
+  script: ./travis/release.sh
   skip_cleanup: true
   on:
     repo: johnjcool/keycloak-cas-services
-  name: $project_version
+    tags: true
+    jdk: oraclejdk8

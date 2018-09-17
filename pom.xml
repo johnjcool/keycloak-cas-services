@@ -15,8 +15,9 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:git:https://github.com/johnjcool/keycloak-cas-services.git</connection>
 		<url>https://github.com/johnjcool/keycloak-cas-services</url>
+		<connection>scm:git:https://github.com/johnjcool/keycloak-cas-services.git</connection>
+		<developerConnection>scm:git:https://github.com/johnjcool/keycloak-cas-services.git</developerConnection>
 	</scm>
 
 	<developers>
@@ -133,11 +134,16 @@
 		<!-- Activate using the release property: mvn clean install -Prelease -->
 		<profile>
 			<id>release</id>
-			<activation>
-				<property>
-					<name>release</name>
-				</property>
-			</activation>
+			<pluginRepositories>
+				<pluginRepository>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<id>bintray-cy6ergn0m-maven</id>
+					<name>bintray-plugins</name>
+					<url>http://dl.bintray.com/cy6ergn0m/maven</url>
+				</pluginRepository>
+			</pluginRepositories>
 
 			<build>
 				<plugins>
@@ -166,7 +172,6 @@
 							</execution>
 						</executions>
 					</plugin>
-
 					<!-- To sign the artifacts -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -182,8 +187,25 @@
 							</execution>
 						</executions>
 					</plugin>
+					<plugin>
+						<groupId>cy.github</groupId>
+						<artifactId>github-release-plugin</artifactId>
+						<version>0.5.2</version>
+						<configuration>
+							<tagName>${project.version}</tagName>
+							<releaseTitle>${project.artifactId}-${project.version}</releaseTitle>
+							<serverId>github</serverId>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>gh-upload</goal>
+								</goals>
+								<phase>deploy</phase>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
-
 			</build>
 		</profile>
 	</profiles>
