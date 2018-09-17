@@ -1,4 +1,4 @@
-package org.jjc.keycloak.broker.cas.model;
+package io.github.johnjcool.keycloak.broker.cas.model;
 
 import io.github.johnjcool.keycloak.broker.cas.jaxb.ServiceResponseJaxbContextResolver;
 import io.github.johnjcool.keycloak.broker.cas.jaxb.ServiceResponseJaxbProvider;
