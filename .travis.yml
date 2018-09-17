@@ -33,21 +33,33 @@ jobs:
         - mvn deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease 
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - cd target
-        - docker build -t $DOCKER_USERNAME/keycloak-cas:$project_version .
+        - docker build --tag $DOCKER_USERNAME/keycloak-cas:$project_version --build-arg project_version=$(project_version) .
         - docker push $DOCKER_USERNAME/keycloak-cas:$project_version
         - cd ..
     - stage: deploy_release
       before_script:
         - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
         - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+        - cp src/main/docker/Dockerfile target/Dockerfile
         - export project_version=$TRAVIS_TAG
       script:
         - mvn org.codehaus.mojo:versions-maven-plugin:2.5:set --settings .travis/settings.xml -DnewVersion=$project_version -B -U
         - mvn clean deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease 
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - cd target
-        - docker build -t $DOCKER_USERNAME/keycloak-cas:$project_version ./target
+        - docker build --tag $DOCKER_USERNAME/keycloak-cas:$project_version --build-arg project_version=$(project_version) ./target
         - docker push $DOCKER_USERNAME/keycloak-cas:$project_version
         - docker tag $DOCKER_USERNAME/keycloak-cas:$project_version $DOCKER_USERNAME/keycloak-cas:latest
         - docker push $DOCKER_USERNAME/keycloak-cas:latest
         - cd ..
+      deploy:
+        provider: releases
+        api_key: 
+          secure: u16W9ADbkhxIn9z+dXRHjHqWxVMmbcewYAMSYMMv/NrkV9cDFPu2DO/ApBDceLEkGX7XW1lDGBsiHL87hk6vsmLs7qb3ScWzpjDSBo6G20LxOMpA5f1B/plE9F72vLj3X1sHn3w8gD3Chf6YZ2JN4ouniUHNJwAdxKmULLS5oOB/4pediKPQWzUuDOKr2LrXmdgqLGSiuq5qCNCb84z6JmkHDsbe9sLb7Z96ZeXwzt+pvJlmw9+cvQOj1SHeD/5lHO3qXWAWKrtQwrZv9qIuA220K1zWTxju4FcM/MWHcrWJjhrYQWrLjx9D2q9NxwDJraRZwOGEK+cy0H9wtnF7UDkGp/8Lo7WQbULwHChgSdDoSuhvc6QhGK7yk3m58amrIzHsxBRQUgDGlfRhrpaHeeVFODDjpnPVBFe5RcT63GwSSYC4SQzUUZ1TAYdiTkMHFxKBSts6JcOJuMJm6eNEqo9FRgk5G0Wf8FtYlPxmwbI/oI0IcDCyW3Q178Hn4gozO/oib7m53Z4nVw296lgeWi1Sf4Nqlf+4vo4PkXwT9dOkVxLOAKNQ684e/lrXOuXTOWz2/cZdfKHaCP2EIHXX1NmtXD7VgVzcdBA6Bw8NdZKdZ7IolWjtrtO8+99xv5MWaQve44LK3eR/oqflCb6nVbMlZ/r3pWlWZBtcvbQA8Nw=
+        file: 
+          - keycloak-cas-services-$project_version.jar
+          - keycloak-cas-services-$project_version-javadoc.jar
+          - keycloak-cas-services-$project_version-sources.jar
+        skip_cleanup: true
+        on:
+          tags: true
