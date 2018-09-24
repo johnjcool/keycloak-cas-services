@@ -4,7 +4,7 @@
 
 	<groupId>io.github.johnjcool</groupId>
 	<artifactId>keycloak-cas-services</artifactId>
-	<version>4.1.0-SNAPSHOT</version>
+	<version>4.2.0-SNAPSHOT</version>
 	<name>Keycloak CAS Services</name>
 	<url>https://github.com/johnjcool/keycloak-cas-services</url>
 	<description>Extend Keycloack with CAS IDP.</description>
@@ -31,8 +31,8 @@
 	</developers>
 
 	<properties>
-		<keycloak.version>4.1.0.Final</keycloak.version>
-		<resteasy.version>3.0.24.Final</resteasy.version>
+		<keycloak.version>4.2.0.Final</keycloak.version>
+		<resteasy.version>3.0.26.Final</resteasy.version>
 
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
