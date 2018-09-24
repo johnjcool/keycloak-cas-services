@@ -11,12 +11,14 @@ services:
 cache:
   directories:
     - $HOME/.m2
+    – $HOME/.sonar/cache
     - $TRAVIS_BUILD_DIR/target
   
 addons:
   sonarcloud:
     organization: "johnjcool-github"
-    token: $SONAR_TOKEN
+    token: 
+      secure: $SONAR_TOKEN
 
 stages:
   - compile
