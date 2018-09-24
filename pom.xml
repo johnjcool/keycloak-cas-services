@@ -90,7 +90,6 @@
 			<artifactId>keycloak-model-jpa</artifactId>
 		</dependency>
 
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
