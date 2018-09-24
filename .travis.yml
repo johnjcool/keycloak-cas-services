@@ -19,6 +19,13 @@ stages:
 jobs:
   include:
     - stage: compile
+    - stage: code_quality
+      addons:
+        sonarcloud:
+        organization: "johnjcool"
+        script:
+          # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
+          - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
     - stage: deploy_snapshot
       before_script:
         - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
