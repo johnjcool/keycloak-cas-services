@@ -15,10 +15,10 @@ public class Success implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlElement(name = "user")
+	@XmlElement(name = "user", namespace = "http://www.yale.edu/tp/cas")
 	private String user;
 
-	@XmlElement(name = "attributes")
+	@XmlElement(name = "attributes", namespace = "http://www.yale.edu/tp/cas")
 	@XmlJavaTypeAdapter(AttributesAdapter.class)
 	private Map<String, Object> attributes;
 

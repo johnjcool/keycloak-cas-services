@@ -2,47 +2,47 @@ package io.github.johnjcool.keycloak.broker.cas.model;
 
 import io.github.johnjcool.keycloak.broker.cas.jaxb.ServiceResponseJaxbContextResolver;
 import io.github.johnjcool.keycloak.broker.cas.jaxb.ServiceResponseJaxbProvider;
-import io.github.johnjcool.keycloak.broker.cas.model.ServiceResponse;
-import io.github.johnjcool.keycloak.broker.cas.model.Success;
+import io.undertow.Undertow;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.FileUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.jboss.resteasy.core.Dispatcher;
-import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
-import org.jboss.resteasy.spi.ResteasyDeployment;
+import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ServiceResponseTest {
 
-	protected static ResteasyDeployment deployment;
-	protected static Dispatcher dispatcher;
-
-	@SuppressWarnings("deprecation")
-	private TJWSEmbeddedJaxrsServer s;
+	private static UndertowJaxrsServer server;
 
 	@Test
 	public void testReadSuccess() {
+		server.deploy(MyApp.class);
 		ResteasyProviderFactory.getInstance().registerProvider(ServiceResponseJaxbProvider.class, true);
 		ResteasyProviderFactory.getInstance().registerProvider(ServiceResponseJaxbContextResolver.class, true);
 		Client client = ResteasyClientBuilder.newClient(ResteasyProviderFactory.getInstance());
-		WebTarget target = client.target(String.format("http://%s:%d%s", "127.0.0.1", 9999, "/success"));
+		WebTarget target = client.target(String.format("http://%s:%d%s", "localhost", 9999, "/success"));
 		Response response = target.request().get();
 		Assert.assertEquals(200, response.getStatus());
 		response.bufferEntity();
+
+		System.out.println(response.readEntity(String.class));
 
 		ServiceResponse serviceResponse = response.readEntity(ServiceResponse.class);
 		Success success = serviceResponse.getSuccess();
@@ -52,7 +52,7 @@ public class ServiceResponseTest {
 	}
 
 	@Path("")
-	static public class TestResource {
+	static public class Resource {
 
 		@GET
 		@Path("success")
@@ -63,21 +63,23 @@ public class ServiceResponseTest {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	@Before
-	public void before() throws Exception {
-		s = new TJWSEmbeddedJaxrsServer();
-		s.setPort(9999);
-		s.setBindAddress("127.0.0.1");
-		s.setRootResourcePath("/");
-		s.start();
-		s.getDeployment().getDispatcher().getRegistry().addSingletonResource(new TestResource());
+	@ApplicationPath("")
+	public static class MyApp extends Application {
+		@Override
+		public Set<Class<?>> getClasses() {
+			HashSet<Class<?>> classes = new HashSet<Class<?>>();
+			classes.add(Resource.class);
+			return classes;
+		}
 	}
 
-	@SuppressWarnings("deprecation")
-	@After
-	public void after() throws Exception {
-		s.stop();
+	@BeforeClass
+	public static void init() throws Exception {
+		server = new UndertowJaxrsServer().start(Undertow.builder().addHttpListener(9999, "localhost"));
 	}
 
+	@AfterClass
+	public static void stop() throws Exception {
+		server.stop();
+	}
 }

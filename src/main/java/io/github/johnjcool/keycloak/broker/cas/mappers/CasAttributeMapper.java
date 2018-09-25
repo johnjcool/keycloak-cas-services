@@ -2,6 +2,13 @@ package io.github.johnjcool.keycloak.broker.cas.mappers;
 
 import io.github.johnjcool.keycloak.broker.cas.CasIdentityProvider;
 import io.github.johnjcool.keycloak.broker.cas.CasIdentityProviderFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
 import org.keycloak.broker.provider.AbstractIdentityProviderMapper;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.common.util.CollectionUtil;
@@ -10,12 +17,6 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.provider.ProviderConfigProperty;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 public class CasAttributeMapper extends AbstractIdentityProviderMapper {
 
@@ -73,8 +74,8 @@ public class CasAttributeMapper extends AbstractIdentityProviderMapper {
 	}
 
 	@Override
-	public void preprocessFederatedIdentity(KeycloakSession session, RealmModel realm, IdentityProviderMapperModel mapperModel,
-			BrokeredIdentityContext context) {
+	public void preprocessFederatedIdentity(final KeycloakSession session, final RealmModel realm, final IdentityProviderMapperModel mapperModel,
+			final BrokeredIdentityContext context) {
 		String attribute = mapperModel.getConfig().get(USER_ATTRIBUTE);
 		if (attribute == null || attribute.isEmpty()) {
 			return;
@@ -96,15 +97,15 @@ public class CasAttributeMapper extends AbstractIdentityProviderMapper {
 		}
 	}
 
-	private void setIfNotEmpty(Consumer<String> consumer, List<String> values) {
+	private void setIfNotEmpty(final Consumer<String> consumer, final List<String> values) {
 		if (values != null && !values.isEmpty()) {
 			consumer.accept(values.get(0));
 		}
 	}
 
 	@Override
-	public void updateBrokeredUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel,
-			BrokeredIdentityContext context) {
+	public void updateBrokeredUser(final KeycloakSession session, final RealmModel realm, final UserModel user, final IdentityProviderMapperModel mapperModel,
+			final BrokeredIdentityContext context) {
 		String attribute = mapperModel.getConfig().get(USER_ATTRIBUTE);
 		if (attribute == null || attribute.isEmpty()) {
 			return;
@@ -135,14 +136,15 @@ public class CasAttributeMapper extends AbstractIdentityProviderMapper {
 
 	private List<String> findAttributeValuesInContext(final String attributeName, final BrokeredIdentityContext user) {
 		Object value = ((Map<String, Object>) user.getContextData().get(CasIdentityProvider.USER_ATTRIBUTES)).get(attributeName);
-		if (value instanceof String)
+		if (value instanceof String) {
 			return Collections.singletonList((String) value);
-		else if (value instanceof List)
+		} else if (value instanceof List) {
 			return (List<String>) value;
-		else if(value ==null)
-			return Collections.EMPTY_LIST;
-		else
+		} else if (value == null) {
+			return Collections.emptyList();
+		} else {
 			throw new UnsupportedOperationException("Type: " + value.getClass() + " not supported.");
+		}
 	}
 
 	@Override
