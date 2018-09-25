@@ -1,13 +1,21 @@
 sudo: false
+
 language: java
+
 jdk:
 - oraclejdk8
+
 services:
 - docker
+
 cache:
   directories:
     - $HOME/.m2
     - $TRAVIS_BUILD_DIR/target
+  
+addons:
+  sonarcloud:
+    organization: "johnjcool-github"
 
 stages:
   - compile
@@ -15,10 +23,11 @@ stages:
     if: branch = master
   - name: deploy_release
     if: tag IS present
+  - code_quality
   
 jobs:
   include:
-    - stage: compile
+    - stage: compile    
     - stage: deploy_snapshot
       before_script:
         - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
@@ -59,3 +68,6 @@ jobs:
         skip_cleanup: true
         on:
           tags: true
+    - stage: code_quality
+      script:
+        - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.login=$SONAR_TOKEN
