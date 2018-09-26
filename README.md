@@ -32,7 +32,7 @@ docker run -p 8080:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=xxxxxx johnj
 Central Authentication Service Configuration
 --------------------------------------------
 1. Navigate to [http://localhost:8080/auth/admin](http://localhost:8080/auth/admin)
-2. Login with your admin credentials ![alt text](docs/resources/26-09-2018 20-05-47.png?raw=true "Realm Settings / General")
+2. Login with your admin credentials ![Screenshot](docs/resources/26-09-2018 20-05-47.png?raw=true "Realm Settings / General")
 3. Navigate to Themes **Important!!! You have to do this on master realm** ![alt text](docs/resources/26-09-2018 20-05-59.png?raw=true "Realm Settings / Themes")
 4. Switch Admin Console Theme to keycloak-extended
 5. Signout
