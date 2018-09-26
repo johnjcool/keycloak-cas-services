@@ -32,9 +32,26 @@ docker run -p 8080:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=xxxxxx johnj
 Central Authentication Service Configuration
 --------------------------------------------
 1. Navigate to [http://localhost:8080/auth/admin](http://localhost:8080/auth/admin)
-2. Login with your admin credentials
-3.
+2. Login with your admin credentials ![alt text](docs/resources/26-09-2018 20-05-47.png "Realm Settings / General")
+3. Navigate to Themes **Important!!! You have to do this on master realm** ![alt text](docs/resources/26-09-2018 20-05-59.png "Realm Settings / Themes")
+4. Switch Admin Console Theme to keycloak-extended
+5. Signout
+6. Login with your admin credentials
+7. Navigate to Identity Providers ![alt text](docs/resources/26-09-2018 20-06-21.png "Identity Providers")
+8. Add provider CAS
+9. Configure CAS provider ![alt text](docs/resources/26-09-2018 20-07-15.png "Identity Providers / Add provider")
+10. Click Save
+11. Navigate to Mappers to get Attributes from CAS ![alt text](docs/resources/26-09-2018 20-07-44.png "Identity Providers / Add provider / Mappers")
+12. Configure Attribute Mapper for email, firstName, lastName ![alt text](docs/resources/26-09-2018 20-08-04.png "Identity Providers / Add provider / Mappers") ![alt text](docs/resources/26-09-2018 20-08-54.png "Identity Providers / Add provider / Mappers")
+13. Signout and Central Authentication Service should be available ![alt text](docs/resources/26-09-2018 19-40-25.png "Signin")
+
+Optional Central Authentication Service Configuration
+--------------------------------------------
+1. Login with your admin credentials ![alt text](docs/resources/26-09-2018 20-05-47.png "Realm Settings / General")
+2. Navigate to Authetication 
+3. Click on Actions/Config for Identity Provider Redirector ![alt text](docs/resources/26-09-2018 20-09-49.png "Authentication / Identity Provider Redirector / Actions")
+4. Set Alias and Default Identiy Provider to ```cas``` ![alt text](docs/resources/26-09-2018 20-10-05.png "Authentication / Identity Provider Redirector / Actions / Config")
+5. Signout and now you are automatically redirected to CAS for Login
 
 
-
-Have fun!
+**Have fun!**
