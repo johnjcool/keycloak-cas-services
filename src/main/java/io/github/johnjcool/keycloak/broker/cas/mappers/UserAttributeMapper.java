@@ -1,15 +1,14 @@
 package io.github.johnjcool.keycloak.broker.cas.mappers;
 
-import io.github.johnjcool.keycloak.broker.cas.CasIdentityProvider;
 import io.github.johnjcool.keycloak.broker.cas.CasIdentityProviderFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
-import org.keycloak.broker.provider.AbstractIdentityProviderMapper;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.models.IdentityProviderMapperModel;
@@ -18,13 +17,13 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.provider.ProviderConfigProperty;
 
-public class CasAttributeMapper extends AbstractIdentityProviderMapper {
+public class UserAttributeMapper extends AbstractAttributeMapper {
 
 	private static final String[] cp = new String[] { CasIdentityProviderFactory.PROVIDER_ID };
 
 	private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
-	private static final String ATTRIBUTE_NAME = "attribute.name";
+	private static final String ATTRIBUTE = "attribute";
 	private static final String USER_ATTRIBUTE = "user.attribute";
 	private static final String EMAIL = "email";
 	private static final String FIRST_NAME = "firstName";
@@ -33,9 +32,9 @@ public class CasAttributeMapper extends AbstractIdentityProviderMapper {
 	static {
 		ProviderConfigProperty property;
 		property = new ProviderConfigProperty();
-		property.setName(ATTRIBUTE_NAME);
-		property.setLabel("Attribute Name");
-		property.setHelpText("Name of attribute to search for in assertion.  You can leave this blank and specify a friendly name instead.");
+		property.setName(ATTRIBUTE);
+		property.setLabel("Attribute");
+		property.setHelpText("Name of attribute to search for in assertion.");
 		property.setType(ProviderConfigProperty.STRING_TYPE);
 		configProperties.add(property);
 		property = new ProviderConfigProperty();
@@ -81,19 +80,18 @@ public class CasAttributeMapper extends AbstractIdentityProviderMapper {
 			return;
 		}
 
-		String attributeName = mapperModel.getConfig().get(ATTRIBUTE_NAME);
+		Object value = getAttributeValue(mapperModel, context);
+		List<String> values = toList(value);
 
-		List<String> attributeValuesInContext = findAttributeValuesInContext(attributeName, context);
-		if (!attributeValuesInContext.isEmpty()) {
-			if (attribute.equalsIgnoreCase(EMAIL)) {
-				setIfNotEmpty(context::setEmail, attributeValuesInContext);
-			} else if (attribute.equalsIgnoreCase(FIRST_NAME)) {
-				setIfNotEmpty(context::setFirstName, attributeValuesInContext);
-			} else if (attribute.equalsIgnoreCase(LAST_NAME)) {
-				setIfNotEmpty(context::setLastName, attributeValuesInContext);
-			} else {
-				context.setUserAttribute(attribute, attributeValuesInContext);
-			}
+		if (EMAIL.equalsIgnoreCase(attribute)) {
+			setIfNotEmpty(context::setEmail, values);
+		} else if (FIRST_NAME.equalsIgnoreCase(attribute)) {
+			setIfNotEmpty(context::setFirstName, values);
+		} else if (LAST_NAME.equalsIgnoreCase(attribute)) {
+			setIfNotEmpty(context::setLastName, values);
+		} else {
+			List<String> valuesToString = values.stream().filter(Objects::nonNull).map(Object::toString).collect(Collectors.toList());
+			context.setUserAttribute(attribute, valuesToString);
 		}
 	}
 
@@ -103,6 +101,12 @@ public class CasAttributeMapper extends AbstractIdentityProviderMapper {
 		}
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private List<String> toList(final Object value) {
+		List<Object> values = (value instanceof List) ? (List) value : Collections.singletonList(value);
+		return values.stream().filter(Objects::nonNull).map(Object::toString).collect(Collectors.toList());
+	}
+
 	@Override
 	public void updateBrokeredUser(final KeycloakSession session, final RealmModel realm, final UserModel user, final IdentityProviderMapperModel mapperModel,
 			final BrokeredIdentityContext context) {
@@ -110,40 +114,21 @@ public class CasAttributeMapper extends AbstractIdentityProviderMapper {
 		if (attribute == null || attribute.isEmpty()) {
 			return;
 		}
-		String attributeName = mapperModel.getConfig().get(ATTRIBUTE_NAME);
-		List<String> attributeValuesInContext = findAttributeValuesInContext(attributeName, context);
-		if (attribute.equalsIgnoreCase(EMAIL)) {
-			setIfNotEmpty(user::setEmail, attributeValuesInContext);
-		} else if (attribute.equalsIgnoreCase(FIRST_NAME)) {
-			setIfNotEmpty(user::setFirstName, attributeValuesInContext);
-		} else if (attribute.equalsIgnoreCase(LAST_NAME)) {
-			setIfNotEmpty(user::setLastName, attributeValuesInContext);
+		Object value = getAttributeValue(mapperModel, context);
+		List<String> values = toList(value);
+		if (EMAIL.equalsIgnoreCase(attribute)) {
+			setIfNotEmpty(user::setEmail, values);
+		} else if (FIRST_NAME.equalsIgnoreCase(attribute)) {
+			setIfNotEmpty(user::setFirstName, values);
+		} else if (LAST_NAME.equalsIgnoreCase(attribute)) {
+			setIfNotEmpty(user::setLastName, values);
 		} else {
-			List<String> currentAttributeValues = user.getAttributes().get(attribute);
-			if (attributeValuesInContext.isEmpty()) {
-				// attribute no longer sent by brokered idp, remove it
+			List<String> current = user.getAttribute(attribute);
+			if (!CollectionUtil.collectionEquals(values, current)) {
+				user.setAttribute(attribute, values);
+			} else if (values.isEmpty()) {
 				user.removeAttribute(attribute);
-			} else if (currentAttributeValues == null) {
-				// new attribute sent by brokered idp, add it
-				user.setAttribute(attribute, attributeValuesInContext);
-			} else if (!CollectionUtil.collectionEquals(attributeValuesInContext, currentAttributeValues)) {
-				// attribute sent by brokered idp has different values as before, update it
-				user.setAttribute(attribute, attributeValuesInContext);
 			}
-			// attribute allready set
-		}
-	}
-
-	private List<String> findAttributeValuesInContext(final String attributeName, final BrokeredIdentityContext user) {
-		Object value = ((Map<String, Object>) user.getContextData().get(CasIdentityProvider.USER_ATTRIBUTES)).get(attributeName);
-		if (value instanceof String) {
-			return Collections.singletonList((String) value);
-		} else if (value instanceof List) {
-			return (List<String>) value;
-		} else if (value == null) {
-			return Collections.emptyList();
-		} else {
-			throw new UnsupportedOperationException("Type: " + value.getClass() + " not supported.");
 		}
 	}
 
