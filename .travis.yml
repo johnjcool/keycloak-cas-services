@@ -1,15 +1,73 @@
+sudo: false
+
 language: java
-before_deploy:
-  - mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
-  - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')
-deploy:
-  provider: releases
-  api_key:
-    secure: QVqZCAtS1IxNb0GX52NCfh43FnTr15IFOGIxi0Utzq76BvpAABpLJID2H2Fenk7qDhcakeWPgjgENNDy0rsc63w9HOym2F+IsauMXKZ2D4oAAGw02TmRfIuxxCXJfZfvM2R+PWduN+vmsho5lODs4IesqxbCrkCEBY3VNaP/hKlS2PPtPoV5/vM7XOtt1GPAHNswlgnQHbtnmq28BsA7Qlp/n9jp9cAjqVFfXeXv1B6rTpEkKSFTCQHT7RYUCFJ2LnqQR+8FwtfG1BAe2OvwS7yvNOJMfUnwuuOGTSmU3LIgDkYqXqYi15+ip8p3zk1gqqTfFA1PnFlJY+BuWMqlNgNR/KB1C3LXAWETK9EUjtZEoZjZh50rokKtmtT2s7BAAjaXa9KDV4+SPnG+3tkDneRObtivKqgrUpkZ0kNU/eO/NURuKlwEXEpeH5TH906PZBZOgtpatTdytev7Fsb/6vOLmMKsIVwtJUD2uxCegQQRz7I/KV60XSQjRIqe9F6uxOZ1kTaIqDcbASbIinP4ypgbsVlLJloOr65XXQEWmJWb/H3MAP7wSvXXBubvBzxOzILe0NqH8JWhJlcmPh+FqSmGLUcYIH7+WZ/CNempcHzowAsdZleP+EsygeE9nCTFKS3HHwBA5ROyy7sDD7VlygXse2VfzpPyOxbkqtMDa68=
-  file: 
-    - "target/keycloak-cas-services-$project_version.jar"
-    - "target/keycloak-cas-services-$project_version-sources.jar"
-  skip_cleanup: true
-  on:
-    repo: johnjcool/keycloak-cas-services
-  name: $project_version
+
+jdk:
+- oraclejdk8
+
+services:
+- docker
+
+cache:
+  directories:
+    - $HOME/.m2
+    - $TRAVIS_BUILD_DIR/target
+  
+addons:
+  sonarcloud:
+    organization: "johnjcool-github"
+
+stages:
+  - compile
+  - name: deploy_snapshot
+    if: branch = master
+  - name: deploy_release
+    if: tag IS present
+  - code_quality
+  
+jobs:
+  include:
+    - stage: compile    
+    - stage: deploy_snapshot
+      before_script:
+        - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+        - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust        
+        - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')        
+      script:
+        - mvn deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease 
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cp src/main/docker/Dockerfile target/Dockerfile
+        - cd target
+        - docker build --tag $DOCKER_USERNAME/keycloak-cas:$project_version --build-arg project_version=${project_version} .
+        - docker push $DOCKER_USERNAME/keycloak-cas:$project_version
+        - cd ..
+    - stage: deploy_release
+      before_script:
+        - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+        - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust        
+        - export project_version=$TRAVIS_TAG
+      script:
+        - mvn org.codehaus.mojo:versions-maven-plugin:2.5:set --settings .travis/settings.xml -DnewVersion=$project_version -B -U
+        - mvn clean deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease 
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cp src/main/docker/Dockerfile target/Dockerfile
+        - cd target        
+        - docker build --tag $DOCKER_USERNAME/keycloak-cas:$project_version --build-arg project_version=${project_version} .
+        - docker push $DOCKER_USERNAME/keycloak-cas:$project_version
+        - docker tag $DOCKER_USERNAME/keycloak-cas:$project_version $DOCKER_USERNAME/keycloak-cas:latest
+        - docker push $DOCKER_USERNAME/keycloak-cas:latest
+        - cd ..
+      deploy:
+        provider: releases
+        api_key: 
+          secure: X5KxTm0nA7QzGrIOroEqLuByj5aZyygWpltIQzDl4SCHnNXJ79trc0FRjmcwCpcspSRWLxKiM5J8DseXxjaFP415BTj5iK8eV+631DgOqF87uJDv5jrw9nRTzzqA35f4N+WiLnOf/OkilYOkF3CTWryD1aqwY6MhEeGXrDj7JCWfXBDgtLgUTO4yLE3So52NxxWcOMub9Aef1vvyihtazeRli2D5eqnl0v7G6Rze4IRY90iDQ5JPISOwXsGc09VZKvejUWCNgW2lyLH+oXMUAlVvq672skb+ECuy+QwsTXlvqn853LmavmVySQkukr39iQjahSVCgt4i4fCGKYnee0vWQIuC3TtlhcursYCDPtuIZlB+xgevuf9miv3EflcY3x+rAnGxLsV5bYvmtR8v/RjaokyjamzYaiCjgb+x04LA7TcAguRnDFgE2FhM/OezEY3HmYvHJzFhmFM7v1nYF8r3bx5zpYGTEoAuCZuVt5Oehzoa6mMkAODR/0UaBeHtI6a6YzJm0hrJERKJpxdOCg8d5G74HT2kcWy/fR/nrTXTWRelOs34bzyQfIqUzzVX3jqOqun+JDMLNhX6bARNuAECtGAA8BChy2NPj1zasKBjJUwtcIf/C3MPwGz7C6nnljIWg25s/selveyNIveP2OtIPAa+uwB1PqR53nYxatQ=
+        file: 
+          - target/keycloak-cas-services-$project_version.jar
+          - target/keycloak-cas-services-$project_version-javadoc.jar
+          - target/keycloak-cas-services-$project_version-sources.jar
+        skip_cleanup: true
+        on:
+          tags: true
+    - stage: code_quality
+      script:
+        - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.login=$SONAR_TOKEN

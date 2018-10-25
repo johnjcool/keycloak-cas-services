@@ -13,10 +13,10 @@ public class ServiceResponse implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlElement(name = "authenticationFailure")
+	@XmlElement(name = "authenticationFailure", namespace = "http://www.yale.edu/tp/cas")
 	private Failure failure;
 
-	@XmlElement(name = "authenticationSuccess")
+	@XmlElement(name = "authenticationSuccess", namespace = "http://www.yale.edu/tp/cas")
 	private Success success;
 
 	public Failure getFailure() {

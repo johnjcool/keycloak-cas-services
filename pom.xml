@@ -4,7 +4,10 @@
 
 	<groupId>io.github.johnjcool</groupId>
 	<artifactId>keycloak-cas-services</artifactId>
-	<version>4.1.0-SNAPSHOT</version>
+	<version>4.4.0-SNAPSHOT</version>
+	<name>Keycloak CAS Services</name>
+	<url>https://github.com/johnjcool/keycloak-cas-services</url>
+	<description>Extend Keycloack with CAS IDP.</description>
 
 	<licenses>
 		<license>
@@ -15,8 +18,9 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:git:https://github.com/johnjcool/keycloak-cas-services.git</connection>
 		<url>https://github.com/johnjcool/keycloak-cas-services</url>
+		<connection>scm:git:https://github.com/johnjcool/keycloak-cas-services.git</connection>
+		<developerConnection>scm:git:https://github.com/johnjcool/keycloak-cas-services.git</developerConnection>
 	</scm>
 
 	<developers>
@@ -27,8 +31,7 @@
 	</developers>
 
 	<properties>
-		<keycloak.version>4.1.0.Final</keycloak.version>
-		<resteasy.version>3.0.24.Final</resteasy.version>
+		<keycloak.version>4.4.0.Final</keycloak.version>
 
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -42,11 +45,6 @@
 				<version>${keycloak.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.resteasy</groupId>
-				<artifactId>tjws</artifactId>
-				<version>${resteasy.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -86,7 +84,6 @@
 			<artifactId>keycloak-model-jpa</artifactId>
 		</dependency>
 
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -94,7 +91,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>tjws</artifactId>
+			<artifactId>resteasy-undertow</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -133,11 +130,16 @@
 		<!-- Activate using the release property: mvn clean install -Prelease -->
 		<profile>
 			<id>release</id>
-			<activation>
-				<property>
-					<name>release</name>
-				</property>
-			</activation>
+			<pluginRepositories>
+				<pluginRepository>
+					<snapshots>
+						<enabled>false</enabled>
+					</snapshots>
+					<id>bintray-cy6ergn0m-maven</id>
+					<name>bintray-plugins</name>
+					<url>http://dl.bintray.com/cy6ergn0m/maven</url>
+				</pluginRepository>
+			</pluginRepositories>
 
 			<build>
 				<plugins>
@@ -166,7 +168,6 @@
 							</execution>
 						</executions>
 					</plugin>
-
 					<!-- To sign the artifacts -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -183,7 +184,6 @@
 						</executions>
 					</plugin>
 				</plugins>
-
 			</build>
 		</profile>
 	</profiles>
