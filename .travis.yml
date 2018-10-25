@@ -20,7 +20,8 @@ addons:
 stages:
   - compile
   - name: deploy_snapshot
-    if: branch = master
+    if: branch = master \
+        type = push
   - name: deploy_release
     if: tag IS present
   - code_quality
