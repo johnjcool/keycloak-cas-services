@@ -58,8 +58,6 @@ public class CasIdentityProvider extends AbstractIdentityProvider<CasIdentityPro
 
 	public CasIdentityProvider(final KeycloakSession session, final CasIdentityProviderConfig config) {
 		super(session, config);
-		ResteasyProviderFactory.getInstance().registerProvider(ServiceResponseJaxbProvider.class, true);
-		ResteasyProviderFactory.getInstance().registerProvider(ServiceResponseJaxbContextResolver.class, true);
 		client = ResteasyClientBuilder.newClient(ResteasyProviderFactory.getInstance());
 	}
 
