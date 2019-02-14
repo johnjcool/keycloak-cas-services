@@ -18,7 +18,7 @@ import org.keycloak.provider.ProviderConfigProperty;
 
 public class AttributeToRoleMapper extends AbstractAttributeMapper {
 
-	public static final String[] COMPATIBLE_PROVIDERS = { CasIdentityProviderFactory.PROVIDER_ID };
+	protected static final String[] COMPATIBLE_PROVIDERS = { CasIdentityProviderFactory.PROVIDER_ID };
 
 	private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
