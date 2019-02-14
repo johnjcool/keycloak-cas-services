@@ -32,12 +32,12 @@ public class ServiceResponseTest {
 	private static UndertowJaxrsServer server;
 
 	@Test
-	public void testReadSuccess() {
+	public void testReadWithAttributes() {
 		server.deploy(MyApp.class);
 		ResteasyProviderFactory.getInstance().registerProvider(ServiceResponseJaxbProvider.class, true);
 		ResteasyProviderFactory.getInstance().registerProvider(ServiceResponseJaxbContextResolver.class, true);
 		Client client = ResteasyClientBuilder.newClient(ResteasyProviderFactory.getInstance());
-		WebTarget target = client.target(String.format("http://%s:%d%s", "localhost", 9999, "/success"));
+		WebTarget target = client.target(String.format("http://%s:%d%s", "localhost", 9999, "/with-attributes"));
 		Response response = target.request().get();
 		Assert.assertEquals(200, response.getStatus());
 		response.bufferEntity();
@@ -48,18 +48,46 @@ public class ServiceResponseTest {
 		Success success = serviceResponse.getSuccess();
 
 		Assert.assertEquals("test", success.getUser());
-		Assert.assertTrue(success.getAttributes() != null);
+		Assert.assertTrue(!success.getAttributes().isEmpty());
+	}
+
+	@Test
+	public void testReadWithoutAttributes() {
+		server.deploy(MyApp.class);
+		ResteasyProviderFactory.getInstance().registerProvider(ServiceResponseJaxbProvider.class, true);
+		ResteasyProviderFactory.getInstance().registerProvider(ServiceResponseJaxbContextResolver.class, true);
+		Client client = ResteasyClientBuilder.newClient(ResteasyProviderFactory.getInstance());
+		WebTarget target = client.target(String.format("http://%s:%d%s", "localhost", 9999, "/without-attributes"));
+		Response response = target.request().get();
+		Assert.assertEquals(200, response.getStatus());
+		response.bufferEntity();
+
+		System.out.println(response.readEntity(String.class));
+
+		ServiceResponse serviceResponse = response.readEntity(ServiceResponse.class);
+		Success success = serviceResponse.getSuccess();
+
+		Assert.assertEquals("test", success.getUser());
+		Assert.assertTrue(success.getAttributes().isEmpty());
 	}
 
 	@Path("")
 	static public class Resource {
 
 		@GET
-		@Path("success")
+		@Path("with-attributes")
 		@Consumes("*/*")
 		@Produces("text/html; charset=UTF-8")
-		public String success() throws Exception {
-			return FileUtils.readFileToString(new File("src/test/resources/test.xml"), "UTF-8");
+		public String withAttributes() throws Exception {
+			return FileUtils.readFileToString(new File("src/test/resources/test-with-attributes.xml"), "UTF-8");
+		}
+
+		@GET
+		@Path("without-attributes")
+		@Consumes("*/*")
+		@Produces("text/html; charset=UTF-8")
+		public String withoutAttributes() throws Exception {
+			return FileUtils.readFileToString(new File("src/test/resources/test-without-attributes.xml"), "UTF-8");
 		}
 	}
 
