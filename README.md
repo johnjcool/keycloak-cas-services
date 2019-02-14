@@ -10,7 +10,7 @@ You can use this module as dependency in your own modules.
 <dependency>
 	<groupId>io.github.johnjcool</groupId>
 	<artifactId>keycloak-cas-services</artifactId>
-	<version>4.4.0.Final</version>
+	<version>4.8.3.Final</version>
 </dependency>
 ```
 
