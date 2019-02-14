@@ -1,7 +1,27 @@
 package io.github.johnjcool.keycloak.broker.cas;
 
+import static io.github.johnjcool.keycloak.broker.cas.util.UrlHelper.PROVIDER_PARAMETER_STATE;
+import static io.github.johnjcool.keycloak.broker.cas.util.UrlHelper.PROVIDER_PARAMETER_TICKET;
+import static io.github.johnjcool.keycloak.broker.cas.util.UrlHelper.createAuthenticationUrl;
+import static io.github.johnjcool.keycloak.broker.cas.util.UrlHelper.createLogoutUrl;
+import static io.github.johnjcool.keycloak.broker.cas.util.UrlHelper.createValidateServiceUrl;
 import io.github.johnjcool.keycloak.broker.cas.model.ServiceResponse;
 import io.github.johnjcool.keycloak.broker.cas.model.Success;
+
+import java.net.URI;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -20,25 +40,6 @@ import org.keycloak.models.UserSessionModel;
 import org.keycloak.services.ErrorPage;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.messages.Messages;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.net.URI;
-
-import static io.github.johnjcool.keycloak.broker.cas.util.UrlHelper.PROVIDER_PARAMETER_STATE;
-import static io.github.johnjcool.keycloak.broker.cas.util.UrlHelper.PROVIDER_PARAMETER_TICKET;
-import static io.github.johnjcool.keycloak.broker.cas.util.UrlHelper.createAuthenticationUrl;
-import static io.github.johnjcool.keycloak.broker.cas.util.UrlHelper.createLogoutUrl;
-import static io.github.johnjcool.keycloak.broker.cas.util.UrlHelper.createValidateServiceUrl;
 
 public class CasIdentityProvider extends AbstractIdentityProvider<CasIdentityProviderConfig> {
 
@@ -77,8 +78,7 @@ public class CasIdentityProvider extends AbstractIdentityProvider<CasIdentityPro
 	}
 
 	@Override
-	public Object callback(final RealmModel realm, final org.keycloak.broker.provider.IdentityProvider.AuthenticationCallback callback,
-			final EventBuilder event) {
+	public Object callback(final RealmModel realm, final org.keycloak.broker.provider.IdentityProvider.AuthenticationCallback callback, final EventBuilder event) {
 		return new Endpoint(callback, realm, event);
 	}
 
@@ -108,8 +108,8 @@ public class CasIdentityProvider extends AbstractIdentityProvider<CasIdentityPro
 		@GET
 		public Response authResponse(@QueryParam(PROVIDER_PARAMETER_TICKET) final String ticket, @QueryParam(PROVIDER_PARAMETER_STATE) final String state) {
 			try {
-				CasIdentityProviderConfig config = CasIdentityProvider.this.getConfig();
-				BrokeredIdentityContext federatedIdentity = getFederatedIdentity(CasIdentityProvider.this.client, config, ticket, uriInfo, state);
+				CasIdentityProviderConfig config = getConfig();
+				BrokeredIdentityContext federatedIdentity = getFederatedIdentity(client, config, ticket, uriInfo, state);
 
 				return callback.authenticated(federatedIdentity);
 			} catch (Exception e) {
