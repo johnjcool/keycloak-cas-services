@@ -50,7 +50,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label" for="linkOnly">{{:: 'link-only' | translate}}</label>
                 <div class="col-md-6">
-                    <input ng-model="identityProvider.linkOnly" name="identityProvider.trustEmail" id="linkOnly" onoffswitch on-text="{{:: 'onText' | translate}}" off-text="{{:: 'offText' | translate}}" />
+                    <input ng-model="identityProvider.linkOnly" name="identityProvider.linkOnly" id="linkOnly" onoffswitch on-text="{{:: 'onText' | translate}}" off-text="{{:: 'offText' | translate}}" />
                 </div>
                 <kc-tooltip>{{:: 'link-only.tooltip' | translate}}</kc-tooltip>
             </div>
@@ -105,17 +105,24 @@
 		        </div>
 		        <kc-tooltip>{{:: 'cas-server-url-prefix.tooltip' | translate}}</kc-tooltip>
 		    </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="casServerProtocol3">{{:: 'cas-server-protocol3' | translate}}</label>
+                <div class="col-md-6">
+                    <input ng-model="identityProvider.config.casServerProtocol3" id="casServerProtocol3" onoffswitchvalue on-text="{{:: 'onText' | translate}}" off-text="{{:: 'offText' | translate}}" />
+                </div>
+                <kc-tooltip>{{:: 'cas-server-protocol3.tooltip' | translate}}</kc-tooltip>
+            </div>
 		    <div class="form-group">
 		        <label class="col-md-2 control-label" for="gateway">{{:: 'cas-gateway' | translate}}</label>
 		        <div class="col-md-6">
-		            <input ng-model="identityProvider.config.gateway" name="identityProvider.config.gateway" id="gateway" onoffswitch on-text="{{:: 'onText' | translate}}" off-text="{{:: 'offText' | translate}}" />
+		            <input ng-model="identityProvider.config.gateway" id="gateway" onoffswitchvalue on-text="{{:: 'onText' | translate}}" off-text="{{:: 'offText' | translate}}" />
 		        </div>
 		        <kc-tooltip>{{:: 'cas-gateway.tooltip' | translate}}</kc-tooltip>
 		    </div>
 		    <div class="form-group">
 		        <label class="col-md-2 control-label" for="renew">{{:: 'cas-renew' | translate}}</label>
 		        <div class="col-md-6">
-		            <input ng-model="identityProvider.config.renew" name="identityProvider.config.renew" id="renew" onoffswitch on-text="{{:: 'onText' | translate}}" off-text="{{:: 'offText' | translate}}" />
+		            <input ng-model="identityProvider.config.renew" id="renew" onoffswitchvalue on-text="{{:: 'onText' | translate}}" off-text="{{:: 'offText' | translate}}" />
 		        </div>
 		        <kc-tooltip>{{:: 'cas-renew.tooltip' | translate}}</kc-tooltip>
 		    </div>
