@@ -3,7 +3,7 @@ sudo: false
 language: java
 
 jdk:
-- oraclejdk9
+- openjdk11
 
 services:
 - docker
@@ -12,7 +12,7 @@ cache:
   directories:
     - $HOME/.m2
     - $TRAVIS_BUILD_DIR/target
-  
+
 addons:
   sonarcloud:
     organization: "johnjcool-github"
@@ -20,22 +20,22 @@ addons:
 stages:
   - compile
   - name: deploy_snapshot
-    if: branch = master AND type = push        
+    if: branch = master AND type = push
   - name: deploy_release
     if: tag IS present
   - code_quality
-  
+
 jobs:
   include:
-    - stage: compile    
+    - stage: compile
     - stage: deploy_snapshot
       before_script:
         - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-        - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust        
-        - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[') 
-        - echo $project_version     
+        - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+        - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')
+        - echo $project_version
       script:
-        - mvn deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease 
+        - mvn deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - cp src/main/docker/Dockerfile target/Dockerfile
         - cd target
@@ -47,14 +47,14 @@ jobs:
     - stage: deploy_release
       before_script:
         - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-        - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust        
+        - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
         - export project_version=$TRAVIS_TAG
       script:
         - mvn org.codehaus.mojo:versions-maven-plugin:2.5:set --settings .travis/settings.xml -DnewVersion=$project_version -B -U
-        - mvn clean deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease 
+        - mvn clean deploy --settings .travis/settings.xml -DskipTests=true -B -U -Prelease
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - cp src/main/docker/Dockerfile target/Dockerfile
-        - cd target        
+        - cd target
         - docker build --tag $DOCKER_USERNAME/keycloak-cas:$project_version --build-arg project_version=${project_version} .
         - docker push $DOCKER_USERNAME/keycloak-cas:$project_version
         - docker tag $DOCKER_USERNAME/keycloak-cas:$project_version $DOCKER_USERNAME/keycloak-cas:latest
@@ -62,9 +62,9 @@ jobs:
         - cd ..
       deploy:
         provider: releases
-        api_key: 
+        api_key:
           secure: X5KxTm0nA7QzGrIOroEqLuByj5aZyygWpltIQzDl4SCHnNXJ79trc0FRjmcwCpcspSRWLxKiM5J8DseXxjaFP415BTj5iK8eV+631DgOqF87uJDv5jrw9nRTzzqA35f4N+WiLnOf/OkilYOkF3CTWryD1aqwY6MhEeGXrDj7JCWfXBDgtLgUTO4yLE3So52NxxWcOMub9Aef1vvyihtazeRli2D5eqnl0v7G6Rze4IRY90iDQ5JPISOwXsGc09VZKvejUWCNgW2lyLH+oXMUAlVvq672skb+ECuy+QwsTXlvqn853LmavmVySQkukr39iQjahSVCgt4i4fCGKYnee0vWQIuC3TtlhcursYCDPtuIZlB+xgevuf9miv3EflcY3x+rAnGxLsV5bYvmtR8v/RjaokyjamzYaiCjgb+x04LA7TcAguRnDFgE2FhM/OezEY3HmYvHJzFhmFM7v1nYF8r3bx5zpYGTEoAuCZuVt5Oehzoa6mMkAODR/0UaBeHtI6a6YzJm0hrJERKJpxdOCg8d5G74HT2kcWy/fR/nrTXTWRelOs34bzyQfIqUzzVX3jqOqun+JDMLNhX6bARNuAECtGAA8BChy2NPj1zasKBjJUwtcIf/C3MPwGz7C6nnljIWg25s/selveyNIveP2OtIPAa+uwB1PqR53nYxatQ=
-        file: 
+        file:
           - target/keycloak-cas-services-$project_version.jar
           - target/keycloak-cas-services-$project_version-javadoc.jar
           - target/keycloak-cas-services-$project_version-sources.jar
