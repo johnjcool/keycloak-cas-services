@@ -35,7 +35,9 @@ public class CasIdentityProviderFactory extends AbstractIdentityProviderFactory<
 	}
 
   @Override
-  public <C extends IdentityProviderModel> C createConfig() {
-    return new CasIdentityProviderFactory().createConfig();
+  public CasIdentityProviderConfig createConfig() {
+    
+    return new CasIdentityProviderConfig(new IdentityProviderModel());
+    
   }
 }
