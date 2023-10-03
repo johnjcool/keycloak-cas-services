@@ -30,6 +30,11 @@ public class CasIdentityProviderFactory extends AbstractIdentityProviderFactory<
 	}
 
 	@Override
+	public IdentityProviderModel createConfig() {
+		return new CasIdentityProviderConfig();
+	}
+
+	@Override
 	public String getId() {
 		return PROVIDER_ID;
 	}
