@@ -57,6 +57,13 @@ public class CasIdentityProvider extends AbstractIdentityProvider<CasIdentityPro
 
 	@Override
 	public Response performLogin(final AuthenticationRequest request) {
+		logger.error("performLogin log param");
+		System.out.println("performLogin log param");
+		request.getUriInfo().getQueryParameters()
+				.forEach((k,v)->logger.error("Key : " + k + " Value : " + v));
+		request.getHttpRequest().getDecodedFormParameters()
+				.forEach((k,v)->System.out.println("Key : " + k + " Value : " + v));
+		logger.error(request.getRedirectUri());
 		try {
 			URI authenticationUrl = createAuthenticationUrl(getConfig(), request).build();
 			return Response.seeOther(authenticationUrl).build();

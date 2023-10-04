@@ -23,6 +23,8 @@ public final class UrlHelper {
 	}
 
 	public static UriBuilder createAuthenticationUrl(final CasIdentityProviderConfig config, final AuthenticationRequest request) {
+		System.out.println("Perform login");
+
 		UriBuilder builder = UriBuilder.fromUri(config.getCasServerLoginUrl())
 				.queryParam(PROVIDER_PARAMETER_SERVICE, createServiceUrl(request.getRedirectUri(), request.getState().getEncoded()));
 		if (config.isRenew()) {

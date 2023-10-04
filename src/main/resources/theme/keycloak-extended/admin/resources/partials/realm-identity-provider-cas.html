@@ -98,13 +98,23 @@
         <!-- Begin CAS specific Configuration -->      
         <fieldset>
 		    <legend uncollapsed><span class="text">{{:: 'cas-config' | translate}}</span> <kc-tooltip>{{:: 'cas-config.tooltip' | translate}}</kc-tooltip></legend>
-		    <div class="form-group clearfix">
-		        <label class="col-md-2 control-label" for="casServerUrlPrefix"><span class="required">*</span> {{:: 'cas-server-url-prefix' | translate}}</label>
+
+            <div class="form-group clearfix">
+		        <label class="col-md-2 control-label" for="casRegistryUrl"><span class="required">*</span> {{:: 'cas-registry-url' | translate}}</label>
 		        <div class="col-md-6">
-		            <input class="form-control" id="casServerUrlPrefix" type="text" ng-model="identityProvider.config.casServerUrlPrefix" required>
+		            <input class="form-control" id="casRegistryUrl" type="text" ng-model="identityProvider.config.casRegistryUrl" required>
 		        </div>
-		        <kc-tooltip>{{:: 'cas-server-url-prefix.tooltip' | translate}}</kc-tooltip>
+		        <kc-tooltip>{{:: 'cas-registry-url.tooltip' | translate}}</kc-tooltip>
 		    </div>
+
+            <div class="form-group clearfix">
+                <label class="col-md-2 control-label" for="casServerUrlPrefix"><span class="required">*</span> {{:: 'cas-server-url-prefix' | translate}}</label>
+                <div class="col-md-6">
+                    <input class="form-control" id="casServerUrlPrefix" type="text" ng-model="identityProvider.config.casServerUrlPrefix" required>
+                </div>
+                <kc-tooltip>{{:: 'cas-server-url-prefix.tooltip' | translate}}</kc-tooltip>
+            </div>
+
             <div class="form-group">
                 <label class="col-md-2 control-label" for="casServerProtocol3">{{:: 'cas-server-protocol3' | translate}}</label>
                 <div class="col-md-6">

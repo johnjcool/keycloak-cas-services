@@ -15,10 +15,24 @@ public class CasIdentityProviderConfig extends IdentityProviderModel {
         super(model);
     }
 
+    public CasIdentityProviderConfig() {
+        super();
+    }
+
+    // casRegistryUrl
+    public void setCasRegistryUrl(final String casRegistryUrl) {
+        getConfig().put("casRegistryUrl", casRegistryUrl);
+    }
+
+    public String getCasRegistryUrl() {
+        return getConfig().get("casRegistryUrl");
+    }
+
+    // casServerUrlPrefix
     public void setCasServerUrlPrefix(final String casServerUrlPrefix) {
         getConfig().put("casServerUrlPrefix", casServerUrlPrefix);
     }
-    
+
     public String getCasServerUrlPrefix() {
         return getConfig().get("casServerUrlPrefix");
     }
@@ -26,7 +40,7 @@ public class CasIdentityProviderConfig extends IdentityProviderModel {
     public void setCasServerProtocol3(final boolean casServerProtocol3) {
         getConfig().put("casServerProtocol3", String.valueOf(casServerProtocol3));
     }
-    
+
     public boolean isCasServerProtocol3() {
         return Boolean.valueOf(getConfig().get("casServerProtocol3"));
     }
@@ -34,7 +48,7 @@ public class CasIdentityProviderConfig extends IdentityProviderModel {
     public void setGateway(final boolean gateway) {
         getConfig().put("gateway", String.valueOf(gateway));
     }
-    
+
     public boolean isGateway() {
         return Boolean.valueOf(getConfig().get("gateway"));
     }
@@ -42,13 +56,14 @@ public class CasIdentityProviderConfig extends IdentityProviderModel {
     public void setRenew(final boolean renew) {
         getConfig().put("renew", String.valueOf(renew));
     }
-    
+
     public boolean isRenew() {
         return Boolean.valueOf(getConfig().get("renew"));
     }
 
     public String getCasServerLoginUrl() {
-        return String.format("%s/%s", getConfig().get("casServerUrlPrefix"), DEFAULT_CAS_LOGIN_SUFFFIX);
+//        return String.format("%s/%s", getConfig().get("casServerUrlPrefix"), DEFAULT_CAS_LOGIN_SUFFFIX);
+        return String.format("%s/%s", getConfig().get("casRegistryUrl"), DEFAULT_CAS_LOGIN_SUFFFIX);
     }
 
     public String getCasServerLogoutUrl() {
