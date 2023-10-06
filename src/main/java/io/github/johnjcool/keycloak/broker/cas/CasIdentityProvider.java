@@ -22,6 +22,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import io.github.johnjcool.keycloak.broker.cas.services.CasRegistryService;
+import io.github.johnjcool.keycloak.broker.cas.services.CasRegistryServiceImpl;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -50,6 +52,10 @@ public class CasIdentityProvider extends AbstractIdentityProvider<CasIdentityPro
 
 	private final Client client;
 
+	// Prefix used by keycloak to store additional HTTP GET params from original client request into
+	public static final String LOGIN_SESSION_NOTE_ADDITIONAL_REQ_PARAMS_PREFIX = "client_request_param_";
+	public static final String LOGIN_SESSION_NOTE_ADDITIONAL_REQ_PARAMS_KEY = "PF";
+
 	public CasIdentityProvider(final KeycloakSession session, final CasIdentityProviderConfig config) {
 		super(session, config);
 		client = ResteasyClientBuilder.newClient(ResteasyProviderFactory.getInstance());
@@ -59,13 +65,52 @@ public class CasIdentityProvider extends AbstractIdentityProvider<CasIdentityPro
 	public Response performLogin(final AuthenticationRequest request) {
 		logger.error("performLogin log param");
 		System.out.println("performLogin log param");
+
+		logger.warn("list getQueryParameters");
 		request.getUriInfo().getQueryParameters()
 				.forEach((k,v)->logger.error("Key : " + k + " Value : " + v));
+
+		logger.warn("list getDecodedFormParameters");
 		request.getHttpRequest().getDecodedFormParameters()
+				.forEach((k,v)->logger.error("Key : " + k + " Value : " + v));
+
+		logger.error("list getFormParameters");
+		request.getHttpRequest().getFormParameters()
 				.forEach((k,v)->System.out.println("Key : " + k + " Value : " + v));
+
+		logger.error("list getRedirectUri");
 		logger.error(request.getRedirectUri());
+
+		logger.warn("list getUserSessionNotes");
+		request.getAuthenticationSession()
+				.getUserSessionNotes()
+				.forEach((k,v)->logger.error("notes : " + k + " Value : " + v));
+
+		// TO KEEP
+		logger.warn("list getAuthenticationSession > getClientNotes");
+		request.getAuthenticationSession()
+				.getClientNotes()
+				.forEach((k,v)->logger.error(k + " : " + v));
+		logger.warn("list getAuthenticationSession > getClientNotes > get PF");
+
+		String PF = request.getAuthenticationSession()
+						.getClientNote(LOGIN_SESSION_NOTE_ADDITIONAL_REQ_PARAMS_PREFIX
+								+LOGIN_SESSION_NOTE_ADDITIONAL_REQ_PARAMS_KEY);
+
+		logger.warn("PF : " + PF);
+
+		logger.warn("list getUri getClientScopes");
+		logger.error(request.getAuthenticationSession().getClientScopes());
+
+		logger.warn("list getUri getAbsolutePath");
+		logger.error(request.getHttpRequest().getUri().getAbsolutePath());
+
 		try {
-			URI authenticationUrl = createAuthenticationUrl(getConfig(), request).build();
+			CasRegistryService registryService = new CasRegistryServiceImpl();
+			String casUrl = registryService.getCasRegistry(PF, session, getConfig());
+			System.out.println("2/ casUrl " + casUrl);
+
+			URI authenticationUrl = createAuthenticationUrl(getConfig(), casUrl, request).build();
 			return Response.seeOther(authenticationUrl).build();
 		} catch (Exception e) {
 			throw new IdentityBrokerException("Could send authentication request to cas provider.", e);
@@ -150,6 +195,8 @@ public class CasIdentityProvider extends AbstractIdentityProvider<CasIdentityPro
 
 		private BrokeredIdentityContext getFederatedIdentity(final Client client, final CasIdentityProviderConfig config, final String ticket,
 				final UriInfo uriInfo, final String state) {
+			logger.warn("getFederatedIdentity");
+
 			Response response = null;
 			try {
 				WebTarget target = client.target(createValidateServiceUrl(config, ticket, uriInfo, state));
@@ -158,10 +205,14 @@ public class CasIdentityProvider extends AbstractIdentityProvider<CasIdentityPro
 					throw new Exception("Failed : HTTP error code : " + response.getStatus());
 				}
 
+				logger.warn("response");
+				logger.warn(response.toString());
+
 				response.bufferEntity();
 				if (LOGGER_DUMP_USER_PROFILE.isDebugEnabled()) {
 					LOGGER_DUMP_USER_PROFILE.debug("User Profile XML Data for provider " + config.getAlias() + ": " + response.readEntity(String.class));
 				}
+				logger.warn("User Profile XML Data for provider " + config.getAlias() + ": " + response.readEntity(String.class));
 
 				ServiceResponse serviceResponse = response.readEntity(ServiceResponse.class);
 				if (serviceResponse.getFailure() != null) {
@@ -175,6 +226,11 @@ public class CasIdentityProvider extends AbstractIdentityProvider<CasIdentityPro
 				user.setIdpConfig(config);
 				user.setIdp(CasIdentityProvider.this);
 				user.setCode(state);
+
+				logger.warn("success");
+				logger.error(success.getUser());
+				success.getAttributes().forEach((k,v)->logger.error(k + " : " + v));
+
 				return user;
 			} catch (Exception e) {
 				throw new IdentityBrokerException("Could not fetch attributes from External IdP's userinfo endpoint.", e);

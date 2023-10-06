@@ -6,7 +6,6 @@ public class CasIdentityProviderConfig extends IdentityProviderModel {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String DEFAULT_CAS_LOGIN_SUFFFIX = "login";
     private static final String DEFAULT_CAS_LOGOUT_SUFFFIX = "logout";
     private static final String DEFAULT_CAS_SERVICE_VALIDATE_SUFFFIX = "serviceValidate";
     private static final String DEFAULT_CAS_3_PROTOCOL_PREFIX = "p3";
@@ -59,11 +58,6 @@ public class CasIdentityProviderConfig extends IdentityProviderModel {
 
     public boolean isRenew() {
         return Boolean.valueOf(getConfig().get("renew"));
-    }
-
-    public String getCasServerLoginUrl() {
-//        return String.format("%s/%s", getConfig().get("casServerUrlPrefix"), DEFAULT_CAS_LOGIN_SUFFFIX);
-        return String.format("%s/%s", getConfig().get("casRegistryUrl"), DEFAULT_CAS_LOGIN_SUFFFIX);
     }
 
     public String getCasServerLogoutUrl() {

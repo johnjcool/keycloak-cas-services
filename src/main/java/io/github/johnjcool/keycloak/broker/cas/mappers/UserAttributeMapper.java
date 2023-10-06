@@ -1,5 +1,6 @@
 package io.github.johnjcool.keycloak.broker.cas.mappers;
 
+import io.github.johnjcool.keycloak.broker.cas.CasIdentityProvider;
 import io.github.johnjcool.keycloak.broker.cas.CasIdentityProviderFactory;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.jboss.logging.Logger;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.models.IdentityProviderMapperModel;
@@ -18,6 +20,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.provider.ProviderConfigProperty;
 
 public class UserAttributeMapper extends AbstractAttributeMapper {
+	protected static final Logger logger = Logger.getLogger(UserAttributeMapper.class);
 
 	private static final String[] cp = new String[] { CasIdentityProviderFactory.PROVIDER_ID };
 
@@ -25,9 +28,9 @@ public class UserAttributeMapper extends AbstractAttributeMapper {
 
 	private static final String ATTRIBUTE = "attribute";
 	private static final String USER_ATTRIBUTE = "user.attribute";
-	private static final String EMAIL = "email";
-	private static final String FIRST_NAME = "firstName";
-	private static final String LAST_NAME = "lastName";
+	private static final String EMAIL = "email"; //"P_MEL";
+	private static final String FIRST_NAME = "firstName"; // PRE
+	private static final String LAST_NAME = "lastName"; //NOM
 
 	static {
 		ProviderConfigProperty property;
@@ -75,13 +78,22 @@ public class UserAttributeMapper extends AbstractAttributeMapper {
 	@Override
 	public void preprocessFederatedIdentity(final KeycloakSession session, final RealmModel realm, final IdentityProviderMapperModel mapperModel,
 			final BrokeredIdentityContext context) {
+
+		logger.info("UserAttributeMapper preprocessFederatedIdentity");
+
 		String attribute = mapperModel.getConfig().get(USER_ATTRIBUTE);
 		if (attribute == null || attribute.isEmpty()) {
 			return;
 		}
+		logger.error("attribute");
+		logger.error(attribute);
 
 		Object value = getAttributeValue(mapperModel, context);
 		List<String> values = toList(value);
+
+		logger.error("getAttributeValue values");
+		values.forEach((x)->System.out.println("value : " +x));
+
 
 		if (EMAIL.equalsIgnoreCase(attribute)) {
 			setIfNotEmpty(context::setEmail, values);
@@ -110,12 +122,21 @@ public class UserAttributeMapper extends AbstractAttributeMapper {
 	@Override
 	public void updateBrokeredUser(final KeycloakSession session, final RealmModel realm, final UserModel user, final IdentityProviderMapperModel mapperModel,
 			final BrokeredIdentityContext context) {
+		logger.info("UserAttributeMapper updateBrokeredUser");
+
 		String attribute = mapperModel.getConfig().get(USER_ATTRIBUTE);
 		if (attribute == null || attribute.isEmpty()) {
 			return;
 		}
 		Object value = getAttributeValue(mapperModel, context);
 		List<String> values = toList(value);
+
+		logger.error("updateBrokeredUser getAttributeValue values");
+		values.forEach((x)->System.out.println("value : " +x));
+
+		logger.error("attribute");
+		logger.error(attribute);
+
 		if (EMAIL.equalsIgnoreCase(attribute)) {
 			setIfNotEmpty(user::setEmail, values);
 		} else if (FIRST_NAME.equalsIgnoreCase(attribute)) {

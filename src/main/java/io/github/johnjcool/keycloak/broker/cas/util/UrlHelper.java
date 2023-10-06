@@ -18,18 +18,25 @@ public final class UrlHelper {
 	public static final String PROVIDER_PARAMETER_TICKET = "ticket";
 	public static final String PROVIDER_PARAMETER_STATE = "state";
 
+	private static final String DEFAULT_CAS_LOGIN_SUFFFIX = "login";
+
 	private UrlHelper() {
 		// util
 	}
 
-	public static UriBuilder createAuthenticationUrl(final CasIdentityProviderConfig config, final AuthenticationRequest request) {
-		System.out.println("Perform login");
+	public static UriBuilder createAuthenticationUrl(final CasIdentityProviderConfig config, String casUrl, final AuthenticationRequest request) {
+		System.out.println("Perform login with cas URL: " + casUrl);
 
-		UriBuilder builder = UriBuilder.fromUri(config.getCasServerLoginUrl())
+		String casServerLoginUrl = createCasServerLoginUrl(casUrl);
+		System.out.println("getCasServerLoginUrl:" + casServerLoginUrl);
+
+		UriBuilder builder = UriBuilder.fromUri(casServerLoginUrl)
 				.queryParam(PROVIDER_PARAMETER_SERVICE, createServiceUrl(request.getRedirectUri(), request.getState().getEncoded()));
+
 		if (config.isRenew()) {
 			builder.queryParam(PROVIDER_PARAMETER_RENEW, config.isRenew());
 		}
+
 		if (config.isGateway()) {
 			builder.queryParam(PROVIDER_PARAMETER_GATEWAY, config.isGateway());
 		}
@@ -55,5 +62,9 @@ public final class UrlHelper {
 
 	private static String createServiceUrl(final String serviceUrlPrefix, final String state) {
 		return String.format("%s?%s=%s", serviceUrlPrefix, PROVIDER_PARAMETER_STATE, state);
+	}
+
+	private static String createCasServerLoginUrl(final String casUrl) {
+		return String.format("%s/%s", casUrl, DEFAULT_CAS_LOGIN_SUFFFIX);
 	}
 }
